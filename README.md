@@ -59,7 +59,7 @@ Wednesday COB: re-run a few models (including Random Forest) with class weights 
 
 Thursday COB:  Have re-run "baseline models" with pre-trained word-embeddings from Glove and/or RNN
 
-Friday COB: continue and refine Thursday's work as needed; quick check on major questions before the weekend
+Friday COB: continue and refine Thursday's work as needed; quick check on major questions before the weekend.... check on function organization
 
 
 Week 7/22 - 7/26:
