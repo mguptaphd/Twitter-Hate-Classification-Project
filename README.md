@@ -5,12 +5,10 @@
 
 ### Background:  
 
-
 #### The Influence of Technology on the Rise of Hate Speech:
 
 Hateful and offensive speech in social networks and other online fora is a persistent and toxic problem. 
 Violence attributed to online hate speech has increased worldwide. White-supremacist groups use social media as a tool to distribute their message, where they can incubate their hate online and allow it to spread. But when their rhetoric reaches certain people, the online messages can turn into real-life violence. Several incidents in recent years have shown that when online hate goes offline, it can be deadly.
-
 
 
 #### Challenges for Tech Giants in Monitoring Hate Speech:
@@ -27,7 +25,15 @@ One more complication is that it is hard to distinguish hate speech from just an
 
 A publicly available Twitter sentiment analysis dataset available through the Analytics Vindhya website was used for this project. The dataset consists of over 30,000 tweets that have been pre-labeled as "hate speech" (includes racist or sexist content" or "not hate speech".
 
-#### Exploration:
+The performance of five classifiers (Multinomial Naive Bayes, Support Vector Machine, Logistic Regression, Random Forest and AdaBoost) were initially tested and compared, using different methods for: 
+
+- text cleaning (tokenizing, stemming and lemmatizing)
+- correcting for class imbalance (oversampling, undersampling, SMOTE and class weights)
+- text vectorization methods - count vectorizer, tfidf vectorizer, tfidf with 1-2 n-grams, tfidf with 2-3 ngrams; word embedding methods using Word2Vec and GLoVe were also explored.
+
+#### Data Cleaning and Exploration:
+
+Tweets were cleaned of punctuation
 
 
 
