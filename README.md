@@ -7,24 +7,24 @@
 
 #### The Influence of Technology on the Rise of Hate Speech:
 
-Hateful and offensive speech in social networks and other online fora is a persistent and toxic problem. 
-Violence attributed to online hate speech has increased worldwide. White-supremacist groups use social media as a tool to distribute their message, where they can incubate their hate online and allow it to spread. But when their rhetoric reaches certain people, the online messages can turn into real-life violence. Several incidents in recent years have shown that when online hate goes offline, it can be deadly.
+Reported incidents of hate speech and hate crime have been growing in the United States and around the world in in recent years. Research indicates that one of the factors that has lead to this spike is the growing presence and influence that technology -- and in particular, social media platforms -- has had on people's daily lives. Online forums have provided a safe space for people to share extremist viewpoints without a fear of retribution, allowing them to cultivate followers more easily than than ever. Further, social media platforms are designed with the purpose of sharing content, and the more that individuals are exposed to extreme views, the less resistent they become to them -- including calls to action that can lead to violence in offline spaces.
 
+![]('/visualizations/hatecrime2.jpg')
 
 #### Challenges for Tech Giants in Monitoring Hate Speech:
 
-For all the advances being made in the field, artificial intelligence still struggles when it comes to identifying hate speech. When he testified before Congress in April 2018, Facebook CEO Mark Zuckerberg said it was “one of the hardest” problems to solve.
+For all the advances being made in the field, artificial intelligence still struggles when it comes to identifying hate speech. When he testified before Congress in April 2018, Facebook CEO Mark Zuckerberg said it was “one of the hardest” problems to solve.  Since humans can’t always agree on what can be classified as hate speech, it is especially complicated to create a universal machine learning algorithm that can accurately identify it.
 
-Since humans can’t always agree on what can be classified as hate speech, it is especially complicated to create a universal machine learning algorithm that would identify it. 
 
-One more complication is that it is hard to distinguish hate speech from just an offensive language, even for a human. This becomes a problem especially when labeling is done by random users based on their own subjective judgment, like in this dataset, where users were suggested to label tweets as “hate speech”, “offensive language” or “neither”. 
+## Project Goals:
 
+My goals for this project were to identify practical steps that a busines can take in order to track and analyze user comments on their platforms, as well as effectively censor occurrences of hate speach. 
 
 ## Methodology:
 
 #### Dataset:
 
-A publicly available Twitter sentiment analysis dataset available was used for this project. The public dataset consists of over 30,000 tweets that have been pre-labeled as "hate speech" for including racist or sexist content). 
+A public dataset consisting of over 30,000 tweets that have been pre-labeled as "not hate' or "hate speech" for including racist or sexist content was used for this project.
 
 #### Data Cleaning and Exploration:
 
@@ -34,7 +34,7 @@ Frequency of Words Represented in Class 0 (pre-labeled as not hate):
 
 ![](visualizations/wordcloud/wordcloud0.jpg)
 
-Frequency of Words Represented in Class 1 (pre-labaled as hate):
+Frequency of Words Represented in Class 1 (pre-labeled as hate):
 
 ![](visualizations/wordcloud/wordcloud1.jpg)
 
