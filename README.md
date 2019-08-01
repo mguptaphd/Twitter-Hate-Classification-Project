@@ -1,32 +1,25 @@
-# Twitter Hate Speech Classification Project 
+# Twitter Sentiment Analysis Classification Project:
+
+## Combating the Spread of Misinformation and Extremism in a Networked World
 
 
-## Background:  
+### Background:  
 
 
 #### The Influence of Technology on the Rise of Hate Speech:
 
 Hateful and offensive speech in social networks and other online fora is a persistent and toxic problem. 
+Violence attributed to online hate speech has increased worldwide. White-supremacist groups use social media as a tool to distribute their message, where they can incubate their hate online and allow it to spread. But when their rhetoric reaches certain people, the online messages can turn into real-life violence. Several incidents in recent years have shown that when online hate goes offline, it can be deadly.
 
-Violence attributed to online hate speech has increased worldwide. Societies confronting the trend must deal with questions of free speech and censorship on widely used tech platforms.
-
-White-supremacist groups use social media as a tool to distribute their message, where they can incubate their hate online and allow it to spread. But when their rhetoric reaches certain people, the online messages can turn into real-life violence. Several incidents in recent years have shown that when online hate goes offline, it can be deadly.
-
-“I think that the white-supremacist movement has used technology in a way that has been unbelievably effective at radicalizing people,” said Adam Neufeld, vice president of innovation and strategy for the Anti-Defamation League.
-
-“We should not kid ourselves that online hate will stay online,” Neufeld added. “Even if a small percentage of those folks active online go on to commit a hate crime, it’s something well beyond what we’ve seen for America.”
 
 
 #### Challenges for Tech Giants in Monitoring Hate Speech:
 
-For all the advances being made in the field, artificial intelligence still struggles when it comes to identifying hate speech. 
+For all the advances being made in the field, artificial intelligence still struggles when it comes to identifying hate speech. When he testified before Congress in April 2018, Facebook CEO Mark Zuckerberg said it was “one of the hardest” problems to solve.
 
-When he testified before Congress in April 2018, Facebook CEO Mark Zuckerberg said it was “one of the hardest” problems to solve.
+Since humans can’t always agree on what can be classified as hate speech, it is especially complicated to create a universal machine learning algorithm that would identify it. 
 
-Since humans can’t always agree on what can be classified as hate speech, it is especially complicated to create a universal machine learning algorithm that would identify it. Besides, the datasets used to train models tend to “reflect the majority view of the people who collected or labeled the data”, according to Tommi Gröndahl from the Aalto University, Finland (source).
-
-One more complication is that it is hard to distinguish hate speech from just an offensive language, even for a human. This becomes a problem especially when labeling is done by random users based on their own subjective judgment, like in this dataset, where users were suggested to label tweets as “hate speech”, “offensive language” or “neither”. So when designing a model, it is important to follow criteria that will help to distinguish between hate speech and offensive language.
-
+One more complication is that it is hard to distinguish hate speech from just an offensive language, even for a human. This becomes a problem especially when labeling is done by random users based on their own subjective judgment, like in this dataset, where users were suggested to label tweets as “hate speech”, “offensive language” or “neither”. 
 
 ## Methodology:
 
@@ -54,6 +47,9 @@ Naive Bayes, Support Vector Machine, Logistic Regression, Random Forest,
 
 
 #### Limitations:
+
+So when designing a model, it is important to follow criteria that will help to distinguish between hate speech and offensive language.
+
 
 
 #### Future Work:
