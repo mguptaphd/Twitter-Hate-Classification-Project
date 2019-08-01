@@ -32,11 +32,11 @@ Tweets were cleaned to remove user handle names, punctuation and other non-numer
 
 Frequency of Words Represented in Class 0 (pre-labeled as not hate):
 
-![](data/wordcloud0.png)
+![](visualizations/wordcloud0.png)
 
 Frequency of Words Represented in Class 1 (pre-labaled as hate):
 
-![](data/wordcloud1.png)
+![](visualizations/wordcloud1.png)
 
 #### Training and Testing Predictive Models:
 
@@ -52,9 +52,7 @@ The best performance for each model was chosen for further tuning of model hyper
 
 ### Final Model Selection and Performance:
 
-The best performing model from preliminary analyses was a logistic regression classifer, using a simple word frequency vectorizer (count vectorizer) and oversampling on the training set in order to correct for class imbalances. 
-
-The probability threshold used to determine binary classification was lowered to .2 during the model training phase in order to reduce the number of false negatives and false positives. Final scores are reported below:
+The best performing model from preliminary analyses was a logistic regression classifer, using a simple word frequency vectorizer (count vectorizer) and oversampling on the training set in order to correct for class imbalances. The probability threshold used to determine binary classification was lowered  to .20 during the model training phase in order to reduce the number of false negatives and false positives. Final scores are reported below:
 
 Accuracy: 0.96
 Precision: 0.74 
