@@ -32,11 +32,11 @@ Tweets were cleaned to remove user handle names, punctuation and other non-numer
 
 Frequency of Words Represented in Class 0 (pre-labeled as not hate):
 
-!(data/wordcloud0.png)
+![](data/wordcloud0.png)
 
 Frequency of Words Represented in Class 1 (pre-labaled as hate):
 
-!(data/wordcloud1.png)
+![](data/wordcloud1.png)
 
 #### Training and Testing Predictive Models:
 
@@ -61,7 +61,7 @@ Precision: 0.74
 Recall: 0.62
 F1: 0.68
 
-!(visualizations/final_cm.png)
+![](visualizations/final_cm.png)
 
 
 ## Conclusions:
