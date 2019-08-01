@@ -1,4 +1,4 @@
-# Twitter Sentiment Analysis Classification Project:
+# Twitter Sentiment Classification Project:
 
 ## Combating the Spread of Misinformation and Extremism in a Networked World
 
