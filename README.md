@@ -9,7 +9,7 @@
 
 Reported incidents of hate speech and hate crime have been growing in the United States and around the world in in recent years. Research indicates that one of the factors that has lead to this spike is the growing presence and influence that technology -- and in particular, social media platforms -- has had on people's daily lives. Online forums have provided a safe space for people to share extremist viewpoints without a fear of retribution, allowing them to cultivate followers more easily than than ever. Further, social media platforms are designed with the purpose of sharing content, and the more that individuals are exposed to extreme views, the less resistent they become to them -- including calls to action that can lead to violence in offline spaces.
 
-![]('/visualizations/hatecrime2.jpg')
+![](/visualizations/hatecrime2.jpg)
 
 #### Challenges for Tech Giants in Monitoring Hate Speech:
 
