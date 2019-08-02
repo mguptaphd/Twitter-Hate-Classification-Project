@@ -47,7 +47,7 @@ The performance of five classifiers (Multinomial Naive Bayes, Support Vector Mac
 - text cleaning (tokenizing, stemming and lemmatizing)
 - correcting for class imbalance (oversampling, undersampling, SMOTE and class weights)
 - text vectorization methods - count vectorizer, tfidf vectorizer, tfidf with 1-2 n-grams, tfidf with 2-3 ngrams
-- word embedding using a trained Word2Vec model pre-trained word embeddings from ![GLoVe](https://nlp.stanford.edu/projects/glove/) were also explored
+- word embedding using a trained Word2Vec model pre-trained word embeddings from ![GLoVe]('https://nlp.stanford.edu/projects/glove/') were also explored
 
 Attempts were made to improve precision and recall metrics for each of the classifiers by correcting for class imbalances and conducting grid searches or randomized searches to fine-tune the hyperparameters,  
 
