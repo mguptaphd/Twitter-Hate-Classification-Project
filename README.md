@@ -22,24 +22,21 @@ For all the advances being made in the field, artificial intelligence still stru
 
 My goals for this project were to identify practical steps that an individual or business can take in order to track and analyze user comments on their platforms, as well as effectively censor hate speech sentiment.
 
-## Methodology:
-
-### Dataset:
+## Dataset:
 
 The dataset used for this project was obtained through the [Analytics Vindhya website](https://datahack.analyticsvidhya.com/contest/practice-problem-twitter-sentiment-analysis/#data_dictionary). The publicly available portion of this dataset consists of ~32,000 tweets that have been pre-labeled as "not hate speech" or "hate speech" (i.e., includes racist or sexist content). No details on the methodology used to pre-label the tweets was provided.
 
-#### Tweet Cleaning and Exploration:
+## Text Cleaning and Exploration:
 
-Tweets were cleaned to remove user handle names, punctuation and other non-numerical text. Simple word counts, phrases and predictive word embeddings were explored for tweets in each class, and can be found in "Preliminary Analyses" folder. As can be seen below, tweets pre-labeled as "hate speech" had a higher proportion of words related to race, ethnicity and gender than the "not hate" tweets.
+Tweets were cleaned to remove user handle names, punctuation and other non-numerical text. Simple word counts, phrases and predictive word embeddings were explored for tweets in each class. As can be seen below, tweets pre-labeled as "hate speech" had a higher proportion of words related to race, ethnicity and gender than the "not hate" tweets.
 
-![Pre-labeled as "Not Hate" Tweet](visualizations/readme/wc0_original.jpg)
+Pre-labeled as "Not Hate" Tweets:
 
-![Pre-labeled as "Hate Speech" Tweet](visualizations/readme/wc1_original.jpg)
+<img src="/visualizations/readme/wc0_original.jpg" width="300" />
 
+Pre-labeled as "Hate Speech" Tweets:
 
-## Model Training:
-
-Based on trends in this area of research, I chose to compare the performance of six classifiers (Multinomial Naive Bayes, Support Vector Machine, Logistic Regression, Random Forest, AdaBoost and XGBooster) for the purposes of this project.  
+<img src="/visualizations/readme/wc0_original.jpg" width="300" />
 
 A wide range of text pre-processing and feature engineering methods were utilized and compared in the modeling phase, including:
 
@@ -47,6 +44,10 @@ A wide range of text pre-processing and feature engineering methods were utilize
 - Text Vectorization Methods - Bag of Words, Tfidf, and N-grams
 - Word embeddings using a trained Word2Vec model, as well as pre-trained [GLoVe](https://nlp.stanford.edu/projects/glove/) embeddings
 
+
+## Training Classifiers:
+
+Based on trends in this area of research, I chose to compare the performance of six classifiers (Multinomial Naive Bayes, Support Vector Machine, Logistic Regression, Random Forest, AdaBoost and XGBooster) for the purposes of this project.  
 
 Attempts were made to improve precision and recall metrics for each of the classifiers by correcting for class imbalances and conducting grid searches or randomized searches to fine-tune the hyperparameters,  
 
