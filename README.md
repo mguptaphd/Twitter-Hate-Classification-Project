@@ -7,7 +7,9 @@
 
 Reported incidents of hate speech and hate crime have been growing in the United States and around the world in in recent years. Research indicates that one of the factors that has lead to this spike is the growing presence and influence that technology -- and in particular, social media platforms -- has had on people's daily lives. Online forums have provided a safe space for people to share extremist viewpoints without a fear of retribution, allowing them to cultivate followers more easily than than ever. Further, social media platforms are designed with the purpose of sharing content, and the more that individuals are exposed to extreme views, the less resistent they become to them -- including calls to participate in bigotry, hatred and violence in offline spaces.
 
-![]('/visualizations/hate2.jpg') ![]('/visualizations/hate1.jpg') ![]('/visualizations/hate3.jpg') 
+![]('/visualizations/hate2.jpg') 
+![]('/visualizations/hate1.jpg') 
+![]('/visualizations/hate3.jpg') 
 
 #### Challenges for Tech Giants in Monitoring Hate Speech:
 
@@ -22,7 +24,7 @@ My goals for this project were to identify practical steps that an individual or
 
 #### Dataset:
 
-The dataset used for this project was obtained through the Analytics Vindhya ![website] (https://datahack.analyticsvidhya.com/contest/practice-problem-twitter-sentiment-analysis/#data_dictionary). The dataset consists of over 30,000 tweets that have been pre-labeled as "not hate speech" or "hate speech" (i.e., includes racist or sexist content). No details on the methodology used to pre-label the tweets was provided.
+The dataset used for this project was obtained through the Analytics Vindhya ![website](https://datahack.analyticsvidhya.com/contest/practice-problem-twitter-sentiment-analysis/#data_dictionary). The dataset consists of over 30,000 tweets that have been pre-labeled as "not hate speech" or "hate speech" (i.e., includes racist or sexist content). No details on the methodology used to pre-label the tweets was provided.
 
 #### Tweet Cleaning and Exploration:
 
