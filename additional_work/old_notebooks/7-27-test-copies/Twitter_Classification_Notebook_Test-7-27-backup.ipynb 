@@ -1,0 +1,2812 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "Using TensorFlow backend.\n"
+     ]
+    }
+   ],
+   "source": [
+    "from __future__ import print_function\n",
+    "\n",
+    "import pandas as pd \n",
+    "import numpy as np \n",
+    "import sklearn\n",
+    "\n",
+    "# NLTK/NLP\n",
+    "from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer\n",
+    "import nltk\n",
+    "from nltk import FreqDist, word_tokenize\n",
+    "import string, re\n",
+    "import urllib\n",
+    "from nltk.stem.snowball import SnowballStemmer\n",
+    "from nltk.corpus import stopwords\n",
+    "from gensim.models import word2vec\n",
+    "from nltk.collocations import *\n",
+    "import gensim\n",
+    "from nltk.stem.wordnet import WordNetLemmatizer\n",
+    "from gensim.models import KeyedVectors\n",
+    "\n",
+    "# Classifiers \n",
+    "from sklearn.ensemble import RandomForestClassifier \n",
+    "from sklearn.linear_model import LogisticRegression\n",
+    "from sklearn.svm import SVC\n",
+    "from sklearn.neighbors import KNeighborsClassifier\n",
+    "from sklearn.naive_bayes import GaussianNB\n",
+    "from sklearn.model_selection import GridSearchCV\n",
+    "\n",
+    "# Metrics\n",
+    "from sklearn import metrics\n",
+    "from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_curve, auc, precision_recall_curve\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "\n",
+    "\n",
+    "#Sampling\n",
+    "from imblearn.pipeline import make_pipeline, Pipeline\n",
+    "from imblearn.over_sampling import SMOTE\n",
+    "from sklearn.utils import resample\n",
+    "\n",
+    "import sklearn.decomposition as decomposition\n",
+    "\n",
+    "#Visualization\n",
+    "from wordcloud import WordCloud\n",
+    "import matplotlib.pyplot as plt \n",
+    "import seaborn as sns\n",
+    "%matplotlib inline\n",
+    "\n",
+    "import warnings \n",
+    "warnings.filterwarnings(\"ignore\")\n",
+    "\n",
+    "import csv\n",
+    "\n",
+    "from sklearn.metrics import roc_curve\n",
+    "from sklearn.metrics import roc_auc_score\n",
+    "from matplotlib import pyplot\n",
+    "\n",
+    "from sklearn.metrics import average_precision_score, auc, roc_curve, precision_recall_curve\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pickle"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with open('data/cleaned-reshuffled.pkl', 'rb') as f:\n",
+    "\tdf = pickle.load(f)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>id</th>\n",
+       "      <th>label</th>\n",
+       "      <th>tweet</th>\n",
+       "      <th>tidy_tweet</th>\n",
+       "      <th>no_hash_tweet</th>\n",
+       "      <th>tokenized_tweet</th>\n",
+       "      <th>stemmed_tokens</th>\n",
+       "      <th>lemmatized_tokens</th>\n",
+       "      <th>lem_tweet</th>\n",
+       "      <th>stem_tweet</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>29727</td>\n",
+       "      <td>0</td>\n",
+       "      <td>sad to see the scenes of hooligans pre #engrus...</td>\n",
+       "      <td>sad to see the scenes of hooligans pre #engrus...</td>\n",
+       "      <td>sad to see the scenes of hooligans pre engrus ...</td>\n",
+       "      <td>[sad, to, see, the, scenes, of, hooligans, pre...</td>\n",
+       "      <td>[sad, to, see, the, scene, of, hooligan, pre, ...</td>\n",
+       "      <td>[sad, to, see, the, scene, of, hooligan, pre, ...</td>\n",
+       "      <td>sad to see the scenes of hooligans pre engrus ...</td>\n",
+       "      <td>sad to see the scenes of hooligans pre engrus ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>14466</td>\n",
+       "      <td>0</td>\n",
+       "      <td>#gooddyeyoung #yoyoyo  !! super happy to be ap...</td>\n",
+       "      <td>#gooddyeyoung #yoyoyo super happy to be apa of...</td>\n",
+       "      <td>gooddyeyoung yoyoyo super happy to be apa of t...</td>\n",
+       "      <td>[gooddyeyoung, yoyoyo, super, happy, to, be, a...</td>\n",
+       "      <td>[gooddyeyoung, yoyoyo, super, happi, to, be, a...</td>\n",
+       "      <td>[gooddyeyoung, yoyoyo, super, happy, to, be, a...</td>\n",
+       "      <td>gooddyeyoung yoyoyo super happy to be apa of t...</td>\n",
+       "      <td>gooddyeyoung yoyoyo super happy to be apa of t...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>18194</td>\n",
+       "      <td>0</td>\n",
+       "      <td>queen evil's bihdayð#lnic #lnicjustanevilbd...</td>\n",
+       "      <td>queen evil s bihday #lnic #lnicjustanevilbday ...</td>\n",
+       "      <td>queen evil s bihday lnic lnicjustanevilbday bi...</td>\n",
+       "      <td>[queen, evil, s, bihday, lnic, lnicjustanevilb...</td>\n",
+       "      <td>[queen, evil, s, bihday, lnic, lnicjustanevilb...</td>\n",
+       "      <td>[queen, evil, s, bihday, lnic, lnicjustanevilb...</td>\n",
+       "      <td>queen evil s bihday lnic lnicjustanevilbday bi...</td>\n",
+       "      <td>queen evil s bihday lnic lnicjustanevilbday bi...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>18283</td>\n",
+       "      <td>1</td>\n",
+       "      <td>@user you might be a libtard if... #libtard  #...</td>\n",
+       "      <td>you might be a libtard if #libtard #sjw #liber...</td>\n",
+       "      <td>you might be a libtard if libtard sjw liberal ...</td>\n",
+       "      <td>[you, might, be, a, libtard, if, libtard, sjw,...</td>\n",
+       "      <td>[you, might, be, a, libtard, if, libtard, sjw,...</td>\n",
+       "      <td>[you, might, be, a, libtard, if, libtard, sjw,...</td>\n",
+       "      <td>you might be a libtard if libtard sjw liberal ...</td>\n",
+       "      <td>you might be a libtard if libtard sjw liberal ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>25845</td>\n",
+       "      <td>0</td>\n",
+       "      <td>what are your goals? find out here...   #smile...</td>\n",
+       "      <td>what are your goals find out here #smile</td>\n",
+       "      <td>what are your goals find out here smile</td>\n",
+       "      <td>[what, are, your, goals, find, out, here, smile]</td>\n",
+       "      <td>[what, are, your, goal, find, out, here, smile]</td>\n",
+       "      <td>[what, are, your, goal, find, out, here, smile]</td>\n",
+       "      <td>what are your goals find out here smile</td>\n",
+       "      <td>what are your goals find out here smil</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      id  label                                              tweet  \\\n",
+       "0  29727      0  sad to see the scenes of hooligans pre #engrus...   \n",
+       "1  14466      0  #gooddyeyoung #yoyoyo  !! super happy to be ap...   \n",
+       "2  18194      0  queen evil's bihdayð#lnic #lnicjustanevilbd...   \n",
+       "3  18283      1  @user you might be a libtard if... #libtard  #...   \n",
+       "4  25845      0  what are your goals? find out here...   #smile...   \n",
+       "\n",
+       "                                          tidy_tweet  \\\n",
+       "0  sad to see the scenes of hooligans pre #engrus...   \n",
+       "1  #gooddyeyoung #yoyoyo super happy to be apa of...   \n",
+       "2  queen evil s bihday #lnic #lnicjustanevilbday ...   \n",
+       "3  you might be a libtard if #libtard #sjw #liber...   \n",
+       "4           what are your goals find out here #smile   \n",
+       "\n",
+       "                                       no_hash_tweet  \\\n",
+       "0  sad to see the scenes of hooligans pre engrus ...   \n",
+       "1  gooddyeyoung yoyoyo super happy to be apa of t...   \n",
+       "2  queen evil s bihday lnic lnicjustanevilbday bi...   \n",
+       "3  you might be a libtard if libtard sjw liberal ...   \n",
+       "4            what are your goals find out here smile   \n",
+       "\n",
+       "                                     tokenized_tweet  \\\n",
+       "0  [sad, to, see, the, scenes, of, hooligans, pre...   \n",
+       "1  [gooddyeyoung, yoyoyo, super, happy, to, be, a...   \n",
+       "2  [queen, evil, s, bihday, lnic, lnicjustanevilb...   \n",
+       "3  [you, might, be, a, libtard, if, libtard, sjw,...   \n",
+       "4   [what, are, your, goals, find, out, here, smile]   \n",
+       "\n",
+       "                                      stemmed_tokens  \\\n",
+       "0  [sad, to, see, the, scene, of, hooligan, pre, ...   \n",
+       "1  [gooddyeyoung, yoyoyo, super, happi, to, be, a...   \n",
+       "2  [queen, evil, s, bihday, lnic, lnicjustanevilb...   \n",
+       "3  [you, might, be, a, libtard, if, libtard, sjw,...   \n",
+       "4    [what, are, your, goal, find, out, here, smile]   \n",
+       "\n",
+       "                                   lemmatized_tokens  \\\n",
+       "0  [sad, to, see, the, scene, of, hooligan, pre, ...   \n",
+       "1  [gooddyeyoung, yoyoyo, super, happy, to, be, a...   \n",
+       "2  [queen, evil, s, bihday, lnic, lnicjustanevilb...   \n",
+       "3  [you, might, be, a, libtard, if, libtard, sjw,...   \n",
+       "4    [what, are, your, goal, find, out, here, smile]   \n",
+       "\n",
+       "                                           lem_tweet  \\\n",
+       "0  sad to see the scenes of hooligans pre engrus ...   \n",
+       "1  gooddyeyoung yoyoyo super happy to be apa of t...   \n",
+       "2  queen evil s bihday lnic lnicjustanevilbday bi...   \n",
+       "3  you might be a libtard if libtard sjw liberal ...   \n",
+       "4            what are your goals find out here smile   \n",
+       "\n",
+       "                                          stem_tweet  \n",
+       "0  sad to see the scenes of hooligans pre engrus ...  \n",
+       "1  gooddyeyoung yoyoyo super happy to be apa of t...  \n",
+       "2  queen evil s bihday lnic lnicjustanevilbday bi...  \n",
+       "3  you might be a libtard if libtard sjw liberal ...  \n",
+       "4             what are your goals find out here smil  "
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Train / Val / Test Split"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X = df.drop(['label'], axis = 1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y = df['label']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#splitting into train and test \n",
+    "X_model, X_test, y_model, y_test = train_test_split(X, y, stratify = y,  test_size=0.20, random_state=123)\n",
+    "\n",
+    "#splitting \"model\" into train and validation sets\n",
+    "X_train, X_val, y_train, y_val = train_test_split(X_model, y_model, test_size=0.20, random_state=123)\n",
+    "\n",
+    "# df_train_full = X_train.copy()\n",
+    "# df_train_full['label']= y_train\n",
+    "# train_full_df.to_csv('train_full_df.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0    0.929854\n",
+       "1    0.070146\n",
+       "Name: label, dtype: float64"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "y.value_counts(normalize=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Upsampling and Downsampling Training Data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "upsample_training_data(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "train_upsampled = upsample_training_data(X_train, y_train)\n",
+    "\n",
+    "X_train_up = train_upsampled.drop(['label'], axis = 1)\n",
+    "y_train_up = pd.DataFrame(train_upsampled.label)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "train_upsampled['label'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "train_downsampled = downsample_training_data(X_train, y_train)\n",
+    "\n",
+    "X_train_down = train_downsampled.drop(['label'], axis = 1)\n",
+    "y_train_down = pd.DataFrame(train_downsampled.label)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "train_downsampled['label'].value_counts()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Comparing Vectorization and Method Performance"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "count_vect = CountVectorizer()\n",
+    "tfidf_vectorizer = TfidfVectorizer(min_df=.001)\n",
+    "tfidf_ngram = TfidfVectorizer(ngram_range=(1,2), min_df=.001)\n",
+    "tfidf_ngram2 = TfidfVectorizer(ngram_range=(2,3),min_df=.001)\n",
+    "\n",
+    "logreg = LogisticRegression()\n",
+    "rfc = RandomForestClassifier(random_state=10)\n",
+    "nb = GaussianNB()\n",
+    "svc = SVC(random_state=10)\n",
+    "\n",
+    "vectorization_list = [('COUNT_VECTORIZER', count_vect),\n",
+    "                      ('TFIDF_VECTORIZER', tfidf_vectorizer),\n",
+    "                      ('TFIDF_NGRAM_1_2', tfidf_ngram),\n",
+    "                      ('TFIDF_NGRAM_2_3', tfidf_ngram2)]\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Testing Fun"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "type(X_train.stem_tweet)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "type(X_up)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "training_data = pd.DataFrame(X_train.lem_tweet)\n",
+    "training_data['label']= y_train\n",
+    "\n",
+    "train_0 = training_data[training_data.label==0]\n",
+    "train_1 = training_data[training_data.label==1]\n",
+    "\n",
+    "train_1_up = resample(train_1, replace=True, n_samples=len(train_0),random_state=10)\n",
+    "\n",
+    "train_upsampled = pd.concat([train_1_up, train_0])\n",
+    "\n",
+    "train_upsampled.head()\n",
+    "# X_train_col_up = train_upsampled.drop(['label'], axis = 1)\n",
+    "# y_train_up = train_upsampled.label\n",
+    "\n",
+    "# # perform vectorization\n",
+    "# X_train_up_transformed = vectorizer.fit_transform(X_train_col_up)\n",
+    "# X_val_transformed = vectorizer.transform(X_val_col)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train.lem_tweet.index"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_train.index"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "upsample_training_data(X_train.lem_tweet, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_train.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_up2, y_train_up2, X_train_transf2, X_val_transf2 = \\\n",
+    "upsample_training_data3(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, log, count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train.lem_tweet.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_up2.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transf2.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transf2.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_train_up.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transf.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val.lem_tweet.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transf.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_up, y_up, X_train_transformed, X_val_transformed = \\\n",
+    "upsample_training_data3(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, LogisticRegression(), tfidf_vectorizer)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_up.lem_tweet"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_up.values.ravel()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "test = pd.DataFrame(X_train_up.lem_tweet)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "vect = count_vect.fit_transform(X_up)\n",
+    "vect.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "vect = count_vect.fit_transform(test)\n",
+    "vect.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred, y_val_pred_prob, matrix, \\\n",
+    "compare_metrics, compare_predictions = \\\n",
+    "single_vector_model3(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, LogisticRegression(), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred, y_val_pred_prob, matrix, \\\n",
+    "compare_metrics, compare_predictions = \\\n",
+    "upsample_vector_model(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, LogisticRegression(), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "compare_metrics"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "compare_predictions.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred2, y_val_pred_prob, \\\n",
+    "compare_predictions, metrics_dict2 = \\\n",
+    "smote_vector_model2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, LogisticRegression(), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(20455, 28610)"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train_transformed.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred2, y_val_pred_prob, \\\n",
+    "compare_predictions, metrics_dict2 = \\\n",
+    "upsample_vector_model2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, LogisticRegression(), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred2, y_val_pred_prob, \\\n",
+    "compare_predictions, metrics_dict2 = \\\n",
+    "downsample_vector_model2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, LogisticRegression(), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_val_pred2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "confusion_matrix (y_val, y_val_pred2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_down_transformed, X_val_transformed, y_train_down, y_val_pred2, yval_pp, \\\n",
+    " compare_predictions, metrics_dict = \\\n",
+    "upsample_vector_model2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, LogisticRegression(), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_down_transformed, X_val_transformed, y_train_down, y_val_pred2, yval_pp, \\\n",
+    " compare_predictions, metrics_dict = \\\n",
+    "single_vector_model2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, LogisticRegression(), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_t, X_val_t, y_train_pred, y_val_pred3, y_val_prob, metrics2, pred_df = \\\n",
+    "wrapper_single_vectorization2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val,\n",
+    "                              LogisticRegression(), count_vect, sampling='smote')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_t, X_val_t, y_train_pred, y_val_pred3, y_val_prob, metrics3, pred_df = \\\n",
+    "wrapper_single_vectorization2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val,\n",
+    "                              LogisticRegression(), count_vect, sampling='upsample')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_t, X_val_t, y_train_pred, y_val_pred3, y_val_prob, metrics3, pred_df = \\\n",
+    "wrapper_single_vectorization2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val,\n",
+    "                              LogisticRegression(), count_vect, sampling='downsample')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_t, X_val_t, y_train_pred, y_val_pred3, y_val_prob, metrics3, pred_df = \\\n",
+    "wrapper_single_vectorization2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, log, count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "compare_metrics"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "compare_metrics.items()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "compare_predictions"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# compare_classification_metrics(y_train_up, y_train_pred, y_val, y_val_pred)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# compare_class_predictions(y_val, y_val_pred, y_val_pred_prob2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# X_train_transformed = count_vect.fit_transform(X_train.lem_tweet)\n",
+    "# X_val_transformed = count_vect.transform(X_val.lem_tweet)\n",
+    "\n",
+    "# log = LogisticRegression()\n",
+    "# log.fit(X_train_transformed, y_train.values.ravel())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# y_train_pred = log.predict(X_train_transformed)\n",
+    "# y_val_pred = log.predict(X_val_transformed)\n",
+    "\n",
+    "# # y_train_pred_prob = model.predict_proba(X_train_transformed)\n",
+    "# y_val_pred_prob = log.predict_proba(X_val_transformed)\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "log.fit(X_train_transformed,y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "log = LogisticRegression(class_weight='balanced', penalty = 'l1')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred, y_val_pred_prob, matrix, compare_metrics, compare_predictions = \\\n",
+    "single_vector_model3(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val,log, count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "graph_roc_curve(X_train_transformed,X_val_transformed, y_train, y_val)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Naive Bayes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "np.random.seed(0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "NB_compare_vectorization_model(X_train.lem_tweet, y_train, \n",
+    "                                   X_val.lem_tweet, y_val, GaussianNB())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Logistic Regression"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Logistic Regression: compare vectorizers using lemmitizing + class balances\n",
+    "LR_cw_lemm = wrapper_compare_vectorizations2(X_train.lem_tweet, \n",
+    "                            y_train, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(class_weight='balanced', solver = 'lbfgs'), \n",
+    "                                            vectorization_list, sampling = 'upsample')\n",
+    "\n",
+    "LR_cw_lemm"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Logistic Regression: compare vectorizers using lemmitizing + upsampling\n",
+    "LR_cw_lemm = wrapper_compare_vectorizations(X_train_up.lem_tweet, \n",
+    "                            y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(class_weight='balanced', solver = 'lbfgs'), \n",
+    "                                            vectorization_list, apply_smote = False)\n",
+    "\n",
+    "pd.DataFrame(LR_cw_lemm)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "with open('mycsvfile.csv','a') as f:\n",
+    "    w = csv.writer(f)\n",
+    "    w.writerows(LR_cw_lemm.items())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "(pd.DataFrame.from_dict(data= LR_cw_lemm).to_csv('dict_file.csv', header=False))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#Logistic Regression: compare vectorizers using stemming + class balances\n",
+    "pd.DataFrame(wrapper_compare_vectorizations(X_train.stem_tweet, \n",
+    "                            y_train, X_val.stem_tweet, y_val, \n",
+    "                            LogisticRegression(class_weight='balanced', solver = 'lbfgs'),\n",
+    "                            vectorization_list, apply_smote= True))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Comparison Functions"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "single_vector_model(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val,\n",
+    "                            LogisticRegression(class_weight='balanced', penalty = 'l1'), count_vect)\n",
+    "metrics_dict"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "smote_vector_model(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                    LogisticRegression(class_weight='balanced', penalty = 'l1'), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val_confusion_matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pred_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "single_vector_model(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                    LogisticRegression(class_weight='balanced', penalty = 'l1', random_state=1), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val_confusion_matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "wrapper_single_vectorization(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(class_weight='balanced', penalty = 'l1', random_state=1),\n",
+    "                            count_vect, apply_smote = False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val_confusion_matrix"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Multiple Comparison Functions"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "metrics_dict = wrapper_compare_vectorizations(X_train_up.lem_tweet, \n",
+    "                            y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(random_state =10, solver = 'lbfgs'),\n",
+    "                            vectorization_list, apply_smote = False)\n",
+    "\n",
+    "pd.DataFrame(metrics_dict)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "metrics_dict = wrapper_compare_vectorizations(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(class_weight='balanced', penalty = 'l1'), \n",
+    "                            vectorization_list, apply_smote = False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "metrics_dict = wrapper_compare_vectorizations(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(class_weight='balanced', penalty = 'l1'), \n",
+    "                            vectorization_list, apply_smote = True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Testing Wrappers"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "metrics_dict = wrapper_compare_vectorizations(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            RandomForestClassifier(max_depth=10, random_state=1), \n",
+    "                            vectorization_list, sampling= 'upsampling')\n",
+    "pd.DataFrame(metrics_dict)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "wrapper_single_vectorization2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, \n",
+    "                            RandomForestClassifier(random_state=1), count_vect, sampling='upsample')\n",
+    "metrics_dict"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred, y_val_predprob, confusion_matrix, metrics_dict, pred_df = \\\n",
+    "\\\n",
+    "wrapper_single_vectorization2(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(), count_vect, sampling='downsample')\n",
+    "metrics_dict\n",
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "confusion_matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "%run custom_functions_test.ipynb"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred, y_val_predprob, confusion_matrix, metrics_dict, pred_df = \\\n",
+    "\\\n",
+    "upsample_vector_model2(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(), count_vect)\n",
+    "\n",
+    "X_train_transformed\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, X_val_transformed, y_train_pred, y_val_pred, y_val_predprob, confusion_matrix, metrics_dict, pred_df = \\\n",
+    "\\\n",
+    "wrapper_single_vectorization2(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(), count_vect, sampling = 'upsample')\n",
+    "\n",
+    "X_train_transformed\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##  Final Logistic Regression Model"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "metrics_dict = wrapper_compare_vectorizations(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            LogisticRegression(class_weight='balanced', penalty = 'l1'), \n",
+    "                            vectorization_list, sampling='help')\n",
+    "pd.DataFrame(metrics_dict)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "wrapper_single_vectorization(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            RandomForestClassifier(random_state=1), count_vect, apply_smote=False)\n",
+    "metrics_dict"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "wrapper_single_vectorization(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            RandomForestClassifier(random_state=1), count_vect, apply_smote=True)\n",
+    "metrics_dict"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "logreg = LogisticRegression(random_state=10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "wrapper_single_vectorization(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                            logreg, count_vect, apply_smote = False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "metrics_dict"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_score = logreg.decision_function(X_val_transformed)\n",
+    "   \n",
+    "fpr, tpr, thresholds = roc_curve(y_val, y_score)\n",
+    "y_val_score = logreg.decision_function(X_val_transformed)\n",
+    "val_fpr, val_tpr, thresholds = roc_curve(y_val, y_val_score)\n",
+    "\n",
+    "sns.set_style(\"darkgrid\", {\"axes.facecolor\": \".9\"})\n",
+    "plt.figure(figsize=(10,8))\n",
+    "lw = 2\n",
+    "plt.plot(fpr, tpr, color='darkorange',\n",
+    "         lw=lw, label='ROC curve')\n",
+    "plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')\n",
+    "plt.xlim([0.0, 1.0])\n",
+    "plt.ylim([0.0, 1.05])\n",
+    "plt.yticks([i/20.0 for i in range(21)])\n",
+    "plt.xticks([i/20.0 for i in range(21)])\n",
+    "plt.xlabel('False Positive Rate')\n",
+    "plt.ylabel('True Positive Rate')\n",
+    "plt.title('Receiver operating characteristic (ROC) Curve for Validation Set')\n",
+    "plt.legend(loc=\"lower right\")\n",
+    "print('AUC: {}'.format(auc(fpr, tpr)))\n",
+    "plt.show()\n",
+    "\n",
+    "average_precision = average_precision_score(y_val, y_val_pred)\n",
+    "\n",
+    "print('Average precision-recall score RF: {}'.format(average_precision))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "weighted_predictions_val = []\n",
+    "for item in logreg.predict_proba(X_val_transformed):\n",
+    "    if item[0] <= .85:\n",
+    "        weighted_predictions_val.append(1)\n",
+    "    else:\n",
+    "        weighted_predictions_val.append(0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "val_confusion_matrix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "#with threshhold adjustment\n",
+    "pd.DataFrame(confusion_matrix(y_val, weighted_predictions_val), index = ['actual 0', 'actual 1'], columns = ['predicted 0', 'predicted 1'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pred_df[pred_df['actual_class'] != pred_df['predicted_class']]\n",
+    "pred_df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pred_df['weighted_predictions'] = weighted_predictions_val\n",
+    "pred_df[pred_df['actual_class'] != pred_df['weighted_predictions']].head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.tweet[11418]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Test Set"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_transformed, metrics_dict, train_confusion_matrix, y_test_pred, y_test_prob, test_df = \\\n",
+    "\\\n",
+    "wrapper_single_vectorization(X_train_up.lem_tweet, y_train_up, X_test.lem_tweet, y_test, \n",
+    "                            logreg, count_vect, apply_smote = False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "metrics_dict"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#First calculate the probability scores of each of the datapoints:\n",
+    "y_val_score = model_log.decision_function(X_val)\n",
+    "   \n",
+    "fpr, tpr, thresholds = roc_curve(y_val, y_val_score)\n",
+    "y_train_score = model_log.decision_function(X_train)\n",
+    "train_fpr, train_tpr, thresholds = roc_curve(y_train, y_train_score)\n",
+    "\n",
+    "#plot curve\n",
+    "sns.set_style(\"darkgrid\", {\"axes.facecolor\": \".9\"})\n",
+    "plt.figure(figsize=(10,8))\n",
+    "lw = 2\n",
+    "plt.plot(fpr, tpr, color='darkorange',\n",
+    "         lw=lw, label='ROC curve')\n",
+    "plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')\n",
+    "plt.xlim([0.0, 1.0])\n",
+    "plt.ylim([0.0, 1.05])\n",
+    "plt.yticks([i/20.0 for i in range(21)])\n",
+    "plt.xticks([i/20.0 for i in range(21)])\n",
+    "plt.xlabel('False Positive Rate')\n",
+    "plt.ylabel('True Positive Rate')\n",
+    "plt.title('Receiver operating characteristic (ROC) Curve for Test Set')\n",
+    "\n",
+    "plt.legend(loc=\"lower right\")\n",
+    "print('AUC: {}'.format(auc(fpr, tpr)))\n",
+    "plt.show()\n",
+    "\n",
+    "average_precision = average_precision_score(y_test, y_test_pred)\n",
+    "\n",
+    "print('Average precision-recall score RF: {}'.format(average_precision))\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_score = logreg.decision_function(X_train)\n",
+    "   \n",
+    "fpr, tpr, thresholds = roc_curve(y_test, y_score)\n",
+    "y_test_score = logreg.decision_function(X_train_transformed)\n",
+    "test_fpr, test_tpr, thresholds = roc_curve(y_test, y_test_score)\n",
+    "\n",
+    "sns.set_style(\"darkgrid\", {\"axes.facecolor\": \".9\"})\n",
+    "plt.figure(figsize=(10,8))\n",
+    "lw = 2\n",
+    "plt.plot(fpr, tpr, color='darkorange',\n",
+    "         lw=lw, label='ROC curve')\n",
+    "plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')\n",
+    "plt.xlim([0.0, 1.0])\n",
+    "plt.ylim([0.0, 1.05])\n",
+    "plt.yticks([i/20.0 for i in range(21)])\n",
+    "plt.xticks([i/20.0 for i in range(21)])\n",
+    "plt.xlabel('False Positive Rate')\n",
+    "plt.ylabel('True Positive Rate')\n",
+    "plt.title('Receiver operating characteristic (ROC) Curve for Validation Set')\n",
+    "plt.legend(loc=\"lower right\")\n",
+    "print('AUC: {}'.format(auc(fpr, tpr)))\n",
+    "plt.show()\n",
+    "\n",
+    "average_precision = average_precision_score(y_test, y_test_pred)\n",
+    "\n",
+    "print('Average precision-recall score RF: {}'.format(average_precision))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "weighted_predictions_test = []\n",
+    "for item in logreg.predict_proba(X_train_transformed):\n",
+    "    if item[0] <= .85:\n",
+    "        weighted_predictions_test.append(1)\n",
+    "    else:\n",
+    "        weighted_predictions_test.append(0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pd.DataFrame(confusion_matrix(y_test, weighted_predictions_test), index = ['actual 0', 'actual 1'], columns = ['predicted 0', 'predicted 1'])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## SVM\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#class weight = balanced + lemmatized\n",
+    "svm_metrics_balance, svm_X_train_transformed, svm_X_val_transformed = \\\n",
+    "wrapper_compare_vectorizations(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, \n",
+    "                                   SVC(class_weight ='balanced', gamma='auto', random_state = 10), vectorization_list, apply_smote=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pd.DataFrame(svm_metrics_balance)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#SMOTE + lemmatized \n",
+    "svm_metrics_smote, svm_X_train_smote, svm_X_val_smote   = \\\n",
+    "wrapper_compare_vectorizations(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, \n",
+    "                                   SVC(class_weight ='balanced', gamma='auto', random_state = 10), vectorization_list, apply_smote=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pd.DataFrame(svm_metrics_smote)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#upsampling + lemmatized\n",
+    "svm_metrics_up, svm_X_train_up, svm_X_val_up = \\\n",
+    "wrapper_compare_vectorizations(X_train_up.lem_tweet, y_train, X_val_up.lem_tweet, y_val, \n",
+    "                                   SVC(gamma='auto', random_state = 10), vectorization_list, apply_smote=False)\n",
+    "pd.DataFrame(svm_metrics_up)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Grid Searching:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "wrapper_compare_vectorizations()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_tfid2 =  tfidf_ngram2.fit_transform(X_train_up.lemmatized_tweet)\n",
+    "X_val_tfid2 =  tfidf_ngram2.transform(X_val.lemmatized_tweet)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# svc = SVC(kernel='linear', C=1, gamma=1, class_weight ='balanced')\n",
+    "\n",
+    "params = {\n",
+    "'C': [0.1,.2, .3, 0.8,1,1.2,1.4],\n",
+    "'kernel':['linear', 'rbf'],\n",
+    "'gamma' :[0.1,0.8,1,1.2,1.4]\n",
+    "}\n",
+    "\n",
+    "svm_gs= GridSearchCV(svc, param_grid = params, cv = 3)\n",
+    "\n",
+    "scores = ['f1','accuracy','recall']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "svm_gs.fit(X_train_tfid2, y_train_up)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "svm_gs.best_estimator_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "single_vector_model()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "compare_vectorization_model(X_train_up.lemmatized_tweet, y_train_up, X_val.lemmatized_tweet, y_val, \n",
+    "                                   SVC(C=1.2, cache_size=200, class_weight=None, coef0=0.0,\n",
+    "    decision_function_shape='ovr', degree=3, gamma=1.4, kernel='rbf',\n",
+    "    max_iter=-1, probability=False, random_state=None, shrinking=True,\n",
+    "    tol=0.001, verbose=False))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Random Forest"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Compare Multiple Methods:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Random Forest: compare vectorizers with class weight balances + lemmatizing \n",
+    "rfc_metrics_bal = \\\n",
+    "wrapper_compare_vectorizations(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, \n",
+    "                                   RandomForestClassifier(max_depth= 10, \n",
+    "                                   n_estimators = 100, class_weight='balanced', random_state=10), \n",
+    "                                   vectorization_list, apply_smote=False)\n",
+    "pd.DataFrame(rfc_metrics_bal)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Random Forest: compare vectorizers with upsampling + lemmatizing \n",
+    "rfc_metrics_up = \\\n",
+    "wrapper_compare_vectorizations(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                                   RandomForestClassifier(max_depth= 20, \n",
+    "                                   n_estimators = 100, class_weight='balanced', random_state=10), \n",
+    "                                   vectorization_list, apply_smote=False)\n",
+    "pd.DataFrame(rfc_metrics_up)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Random Forest: compare vectorizers with SMOTE + lemmatizing  \n",
+    "rfc_metrics_smote  = \\\n",
+    "wrapper_compare_vectorizations(X_train.lem_tweet, y_train, X_val.lem_tweet, y_val, \n",
+    "                                   RandomForestClassifier(max_depth= 20, \n",
+    "                                   n_estimators = 100, class_weight='balanced', random_state=10), \n",
+    "                                   vectorization_list, apply_smote=False)\n",
+    "pd.DataFrame(rfc_metrics_smote)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_transformed, metrics_dict, val_confusion_matrix, y_val_pred, y_val_prob, pred_df = \\\n",
+    "\\\n",
+    "single_vector_model(X_train_up.lem_tweet, y_train_up, X_val.lem_tweet, y_val, \n",
+    "                    RandomForestClassifier(max_depth= 20, \n",
+    "                                   n_estimators = 100, class_weight='balanced', random_state=10), count_vect)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Grid-Searching For Best Fit for Count Vectorizer + Upsampling"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "np.random.seed(0)\n",
+    "# rfc = RandomForestClassifier(n_estimators=60, max_depth=6, random_state=10, class_weight = 'balanced')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_countvect =  count_vect.fit_transform(X_train.lem_tweet)\n",
+    "X_val_countvect =  count_vect.transform(X_val.lem_tweet)\n",
+    "X_test_countvect = count_vect.transform(X_test.lem_tweet)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rfc = RandomForestClassifier(random_state=10)\n",
+    "\n",
+    "parameters = {'n_estimators' : [40, 60, 80, 100],\n",
+    "'max_leaf_nodes' : [200, 400, 600],\n",
+    "'random_state' : [10],\n",
+    "'max_depth': [5, 7, 10, 20],\n",
+    " 'verbose' : [0],\n",
+    "'class_weight': ['balanced', 'balanced_subsample']}\n",
+    "          \n",
+    "rfc_gs = GridSearchCV(rfc, param_grid=parameters, cv = 3)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rfc_gs.fit(X_train_countvect, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rfc_gs.best_params_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rfc_gs.best_estimator_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rfc2 = RandomForestClassifier(bootstrap=True, class_weight='balanced',\n",
+    "                       criterion='gini', max_depth=20, max_features='auto',\n",
+    "                       max_leaf_nodes=200, min_impurity_decrease=0.0,\n",
+    "                       min_impurity_split=None, min_samples_leaf=1,\n",
+    "                       min_samples_split=2, min_weight_fraction_leaf=0.0,\n",
+    "                       n_estimators=100, n_jobs=None, oob_score=False,\n",
+    "                       random_state=10, verbose=0, warm_start=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "rfc2.fit(X_train_countvect, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_train_predict = rfc2.predict(X_train_countvect)\n",
+    "metrics.f1_score(y_train, y_train_predict)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_val_predict = rfc2.predict(X_val_countvect)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "metrics.f1_score(y_val, y_val_predict)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "%matplotlib inline\n",
+    "\n",
+    "def plot_feature_importances(rfc2):\n",
+    "    n_features = X_val_countvect.shape[1]\n",
+    "    plt.figure(figsize=(8,8))\n",
+    "    plt.barh(range(n_features), rfc2.feature_importances_, align='center') \n",
+    "    plt.yticks(np.arange(n_features), countvect.values) \n",
+    "    plt.xlabel(\"Feature importance\")\n",
+    "    plt.ylabel(\"Feature\")\n",
+    "\n",
+    "plot_feature_importances(rfc2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Word to Vec"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "type(df.tokenized_tweet[0])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "(X_train.tokenized_tweet[0])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train.tokenized_tweet.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### X-train pre-processing"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "X_train.tokenized_tweet.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# X_train['tokenized_tweet']= X_train['tokenized_tweet'].apply(eval)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_token_list = list(X_train.tokenized_tweet)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "type(X_train_token_list[0])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_token_sumlist = sum(X_train_token_list,[])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_unique_tokens = set(X_train_token_sumlist)\n",
+    "print('The unique number of words in the training dataset is: {}'.format(len(X_train_unique_tokens)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### X-val pre-processing"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_val_token_list = list(X_val['tokenized_tweet'])\n",
+    "X_val_token_sumlist = sum(X_val_token_list,[])\n",
+    "X_val_unique_tokens = set(X_val_token_sumlist)\n",
+    "\n",
+    "print('The unique number of words in the validation dataset is: {}'.format(len(X_val_unique_tokens)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### X-test pre-processing"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_test_token_list = list(X_test['tokenized_tweet'])\n",
+    "X_test_token_sumlist = sum(X_test_token_list,[])\n",
+    "\n",
+    "X_test_unique_tokens = set(X_test_token_sumlist)\n",
+    "print('The unique number of words in the training dataset is: {}'.format(len(X_test_unique_tokens)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Training Model"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from time import time\n",
+    "t = time()\n",
+    "\n",
+    "w2v_model = gensim.models.Word2Vec(X_train_token_list, sg=1, min_count=1)\n",
+    "\n",
+    "print('Time to train the model: {} mins'.format(round((time() - t) / 60, 2)))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v_model.train(X_train_token_list, total_examples=w2v_model.corpus_count, epochs=w2v_model.epochs)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v_model.save('data/w2v.model')\n",
+    "\n",
+    "w2v = gensim.models.Word2Vec.load('data/w2v.model')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [],
+   "source": [
+    "w2v.corpus_count"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v_vocab= w2v.wv.vocab"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "len(w2v_vocab)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v.wv.vectors.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v.wv['trump']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v.wv.most_similar(['trump'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v.wv.most_similar(['racist'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v.wv.most_similar(positive=['lazy','black'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v.wv"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v.wv.get_keras_embedding"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v_X = w2v.wv.vectors"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Classification with Word2Vec"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "sentence = X_train_token_list[1]\n",
+    "sentence"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_w2v = np.empty((20455, 100))\n",
+    "for sentence in X_train_token_list:\n",
+    "    np.append(X_train_w2v, np.mean([w2v[w] for w in sentence if w in w2v]\n",
+    "                   or [np.zeros(100)], axis=0))\n",
+    "\n",
+    "X_val_w2v = np.empty((5114, 100))\n",
+    "for sentence in X_val_token_list:\n",
+    "    np.append(X_val_w2v, np.mean([w2v[w] for w in sentence if w in w2v]\n",
+    "                   or [np.zeros(100)], axis=0))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_w2v[20]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#create average vector for train and test from model\n",
+    "#returned list of numpy arrays are then stacked \n",
+    "\n",
+    "X_train_w2v_2 = np.concatenate([avg_word_vectors(word, w2v) for word in X_train_token_list])\n",
+    "\n",
+    "X_val_w2v_2 = np.concatenate([avg_word_vectors(word, w2v) for word in X_val_token_list])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_w2v_2[10]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Classification with Word Embeddings"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "smote_w2v_model(X_train_w2v, y_train, X_val_w2v, y_val, LogisticRegression(solver='lbfgs'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "smote_w2v_model(X_train_w2v_2, y_train, X_val_w2v_2, y_val, LogisticRegression(solver='lbfgs'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "smote_w2v_model(X_train_w2v_2, y_train, X_val_w2v_2, y_val, RandomForestClassifier())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Glove"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# from gensim.scripts.glove2word2vec import glove2word2vec\n",
+    "\n",
+    "# glove_input_file = 'data/glove.twitter.27B.100d.txt'\n",
+    "# glove_output_file = 'data/glove.txt.word2vec'\n",
+    "# glove2word2vec(glove_input_file, glove_output_file)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "glove_model = KeyedVectors.load_word2vec_format('data/glove.txt.word2vec', binary=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "w2v.most_similar('black')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "glove_model.most_similar('black')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "glove_model['love']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_token_list[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_glove2 = np.empty((20455, 100))\n",
+    "for sentence in X_train_token_list:\n",
+    "    np.append(X_train_glove2, np.mean([glove_model[w] for w in sentence if w in glove_model]\n",
+    "                   or [np.zeros(100)], axis=0))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_glove = np.concatenate([avg_word_vectors(w, glove_model) for w in X_train_token_list])\n",
+    "X_val_glove = np.concatenate([avg_word_vectors(w, glove_model) for w in X_val_token_list])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_w2v[10]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_w2v_2[10]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_glove[255]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "smote_w2v_model (X_train_glove, y_train, X_val_glove, y_val, LogisticRegression (class_weight='balanced'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "##  Testing Scraped Trump Tweets"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "trump_df= pd.read_csv('data/cleaned-trump-tweet.csv')\n",
+    "trump_df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train_countvect =  count_vect.fit_transform(X_train_up.lem_tweet)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "logreg = LogisticRegression(class_weight='balanced')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "logreg.fit(X_train_countvect, y_train_up)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_trump = count_vect.transform(trump_df.lem_tweet)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_trump = X_trump.toarray()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_trump.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_trump_predict = logreg.predict(X_trump)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_trump_predict"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump_df['predictions'] = y_trump_predict"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_trump_predict_prob = logreg.predict_proba(X_trump)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "y_trump_predict_prob = pd.DataFrame(y_trump_predict_prob)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump_df['predict_probability'] = y_trump_predict_prob[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump_df = trump_df[['tweet','predictions', 'predict_probability']]\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump0 = trump_df[trump_df.predictions == 0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "pd.set_option('display.max_colwidth', -1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump0.tweet"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump_df[trump_df.predictions == 0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump1 = trump_df[trump_df.predictions == 1]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "trump1.tweet"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.3"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
