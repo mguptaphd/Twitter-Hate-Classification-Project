@@ -5,65 +5,58 @@
 
 ## Background:  
 
-#### The Influence of Technology on the Rise of Hate Speech:
+Reported incidents of hate speech and hate crime have been growing in the United States and around the world in in recent years. Research indicates that one of the factors that has lead to this spike is the growing presence and influence that technology -- and in particular, social media platforms -- has had on people's daily lives. Online forums have provided a safe space for people to share extremist viewpoints without a fear of retribution, allowing them to cultivate followers more easily than than ever. Further, social media platforms are designed with the purpose of sharing content, and the more that individuals are exposed to extreme views, the less resistent they become to them -- including calls to participate in bigotry, hatred and violence in offline spaces.
 
-Reported incidents of hate speech and hate crime have been growing in the United States and around the world in in recent years. Research indicates that one of the factors that has lead to this spike is the growing presence and influence that technology -- and in particular, social media platforms -- has had on people's daily lives. Online forums have provided a safe space for people to share extremist viewpoints without a fear of retribution, allowing them to cultivate followers more easily than than ever. Further, social media platforms are designed with the purpose of sharing content, and the more that individuals are exposed to extreme views, the less resistent they become to them -- including calls to action that can lead to violence in offline spaces.
-
-![](/visualizations/hatecrime2.jpg)
+![]('/visualizations/hate2.jpg') ![]('/visualizations/hate1.jpg') ![]('/visualizations/hate3.jpg') 
 
 #### Challenges for Tech Giants in Monitoring Hate Speech:
 
-For all the advances being made in the field, artificial intelligence still struggles when it comes to identifying hate speech. When he testified before Congress in April 2018, Facebook CEO Mark Zuckerberg said it was “one of the hardest” problems to solve.  Since humans can’t always agree on what can be classified as hate speech, it is especially complicated to create a universal machine learning algorithm that can accurately identify it.
+For all the advances being made in the field, artificial intelligence still struggles when it comes to identifying hate speech. When he testified before Congress in April 2018, Facebook CEO Mark Zuckerberg said that this was “one of the hardest” problems to solve.  Since humans can’t always agree on what can be classified as hate speech, it is especially complicated to create a universal machine learning algorithm that can accurately identify it.
 
 
 ## Project Goals:
 
-My goals for this project were to identify practical steps that a busines can take in order to track and analyze user comments on their platforms, as well as effectively censor occurrences of hate speach. 
+My goals for this project were to identify practical steps that an individual or business can take in order to track and analyze user comments on their platforms, as well as effectively censor hate speech sentiment.
 
 ## Methodology:
 
 #### Dataset:
 
-A public dataset consisting of over 30,000 tweets that have been pre-labeled as "not hate' or "hate speech" for including racist or sexist content was used for this project.
+The dataset used for this project was obtained through the Analytics Vindhya ![website] (https://datahack.analyticsvidhya.com/contest/practice-problem-twitter-sentiment-analysis/#data_dictionary). The dataset consists of over 30,000 tweets that have been pre-labeled as "not hate speech" or "hate speech" (i.e., includes racist or sexist content). No details on the methodology used to pre-label the tweets was provided.
 
-#### Data Cleaning and Exploration:
+#### Tweet Cleaning and Exploration:
 
-Tweets were cleaned to remove user handle names, punctuation and other non-numerical text. Simple word counts, phrases and predictive word embedding were explored for each class and can be found in the data exploration notebook. 
+Tweets were cleaned to remove user handle names, punctuation and other non-numerical text. Simple word counts, phrases and predictive word embeddings were explored for tweets in each class, and can be found in "Preliminary Analyses" folder. As can be seen below, tweets pre-labeled as "hate speech" had a higher proportion of words related to race, ethnicity and gender than the "not hate" tweets.
 
-Frequency of Words Represented in Class 0 (pre-labeled as not hate):
+![Pre-labeled as "Not Hate" Tweet](visualizations/wordcloud/wc0_original.jpg)
 
-![](visualizations/wordcloud/wordcloud0.jpg)
+![Pre-labeled as "Hate Speech" Tweet](visualizations/wordcloud/wc1_original.jpg)
 
-Frequency of Words Represented in Class 1 (pre-labeled as hate):
 
-![](visualizations/wordcloud/wordcloud1.jpg)
+#### Training and Testing Classification Models:
 
-#### Training and Testing Predictive Models:
+Based on trends in this area of research, I chose to compare the performance of six classifiers (Multinomial Naive Bayes, Support Vector Machine, Logistic Regression, Random Forest, AdaBoost and XGBooster) for the purposes of this project.  
 
-The data was divided into training, validation and test sets based off the portion of the dataset that was publicly available.
+A wide range of text pre-processing and feature engineering methods were utilized and compared in the modeling phase, including:
 
-The performance of five classifiers (Multinomial Naive Bayes, Support Vector Machine, Logistic Regression, Random Forest and AdaBoost) were initially compared using different methods for:
+- Tokenizing, Stemming and Lemitization 
+- Text Vectorization Methods - Bag of Words, Tfidf, and N-grams
+- Word embeddings using a trained Word2Vec model, as well as pre-trained ![GLoVe](https://nlp.stanford.edu/projects/glove/) embeddings
 
-- text cleaning (tokenizing, stemming and lemmatizing)
-- correcting for class imbalance (oversampling, undersampling, SMOTE and class weights)
-- text vectorization methods - count vectorizer, tfidf vectorizer, tfidf with 1-2 n-grams, tfidf with 2-3 ngrams
-- word embedding using a trained Word2Vec model pre-trained word embeddings from [GLoVe](https://nlp.stanford.edu/projects/glove/) were also explored
 
 Attempts were made to improve precision and recall metrics for each of the classifiers by correcting for class imbalances and conducting grid searches or randomized searches to fine-tune the hyperparameters,  
+
+- correcting for class imbalance (oversampling, undersampling, SMOTE and class weights)
+
+
 
 and then final F1 scores for each model were compared to determine the best classifier. 
 
 #### Final Model Selection and Performance:
 
-The best performing model from preliminary analyses was a logistic regression classifer, using a simple word frequency vectorizer (count vectorizer) and oversampling on the training set in order to correct for class imbalances. The probability threshold used to determine binary classification was lowered to .20 during the model training phase in order to reduce the number of false negatives and false positives.
+The best performing model from preliminary analyses was a logistic regression classifer, using a simple word frequency vectorizer (count vectorizer) and oversampling on the training set in order to correct for class imbalances. The probability threshold used to determine binary classification was lowered to .20 during the model training phase in order to reduce the number of false negatives and false positives.  
 
-Accuracy: 0.96
-
-Precision: 0.74 
-
-Recall: 0.62
-
-F1: 0.68
+Final metrics included:  Accuracy: 0.96, Precision: 0.74, Recall: 0.62, F1: 0.68
 
 ![](visualizations/final_cm.png)
 
@@ -87,5 +80,7 @@ Second, this project highlighted the unique challenges in working with social me
 
 
 
+
+  
 
   
