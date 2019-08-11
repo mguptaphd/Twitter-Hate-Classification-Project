@@ -1,0 +1,18 @@
+,COUNT_VECTORIZER,TFIDF_VECTORIZER,TFIDF_NGRAM_1_2,TFIDF_NGRAM_2_3
+Train Accuracy,0.93,0.93,0.93,0.93
+Train F1,0.0,0.0,0.0,0.0
+Train Precision,0.0,0.0,0.0,0.0
+Train Recall,0.0,0.0,0.0,0.0
+Validation Accuracy,0.93,0.93,0.93,0.93
+Validation F1,0.0,0.0,0.0,0.0
+Validation Precision,0.0,0.0,0.0,0.0
+Validation Recall,0.0,0.0,0.0,0.0
+,COUNT_VECTORIZER,TFIDF_VECTORIZER,TFIDF_NGRAM_1_2,TFIDF_NGRAM_2_3
+Train Accuracy,0.07,0.07,0.07,0.08
+Train F1,0.13,0.13,0.13,0.13
+Train Precision,0.07,0.07,0.07,0.07
+Train Recall,1.0,1.0,1.0,1.0
+Validation Accuracy,0.07,0.07,0.07,0.08
+Validation F1,0.13,0.13,0.13,0.13
+Validation Precision,0.07,0.07,0.07,0.07
+Validation Recall,1.0,1.0,1.0,1.0
