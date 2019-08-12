@@ -106,3 +106,8 @@ venv.bak/
 #data and w2v models too large to upload
 data/
 
+#ignore results folder until verified
+results/
+
+#ignore temporary swp files
+*.swp
