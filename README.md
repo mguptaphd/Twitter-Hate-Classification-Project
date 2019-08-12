@@ -1,5 +1,6 @@
 # Combating the Spread of Misinformation and Extremism in a Networked World
 
+By: Manisha Gupta, Ph.D., Social Psychology (Concentration in Peace and the Prevention of Violence)
 
 ## Background:  
 
@@ -37,23 +38,23 @@ Pre-labeled as "Hate Speech" Tweets:
 <img src="/visualizations/readme/wc1_original.jpg" width="500" />
 
 
-## Predictive Model Training:
+## Classifier Training:
 
-The performance of six classifiers (Multinomial Naive Bayes, Support Vector Machine, Logistic Regression, Random Forest, AdaBoost and XGBooster) were compared for this project.
+Seven classifiers were trained and tested for this project (Multinomial Naive Bayes, Support Vector Machine, Logistic Regression, Random Forest, AdaBoost, XGBooster, and a Recurrent Neural Network). More details on the performance of each classifier can be found in the "preliminary analyses" folder. 
 
 A wide variety of text pre-processing and feature engineering techniques were utilized and compared in order to improve classifier performance, including:
 
 - Stemming and Lemitization 
-- Text Vectorization Methods: Bag of Words, Tf-idf, and n-grams
-- Word Embeddings: Word2Vec and pre-trained [GLoVe](https://nlp.stanford.edu/projects/glove/) word vctors
+- Text Vectorization Methods: Count Vectorizer, TFIDF, N-grams, Word2Vec, and pre-trained word vectors 
+- Word Embeddings: I trained a Word2Vec model to obtain mean word embeddings specific to my dataset, and also employed transfer-learning techniques using the pre-trained [GloVe](https://nlp.stanford.edu/projects/glove/) word vectors for Twitter
 
-A broad range of techniques to address the severe imbalance in class size were also compared in the training phase, including: oversampling, undersampling, SMOTE (synthetic oversampling minority technique), and the use of class weights. 
+A broad range of techniques to address the imbalance in class size were also compared in the training phase for each classifier, including: oversampling, undersampling, SMOTE (synthetic oversampling minority technique), and the use of class weights. 
 
-Finally, a grid search or randomized search was conducted to fine-tune the remaining hyperparameters for each model, and the probability threshold for classification was adjusted, as applicable, to maximize F1 score performance. 
+Finally, a grid search or randomized search was conducted to fine-tune the hyperparameters for each of the classifiers (except for the RNN, due to computational processing limitations), and the probability threshold for determining classification was adjusted, when applicable, to maximize F1 score performance. 
 
 ## Final Model Selection: 
 
-The best performing model on the the testing data was a logistic regression classifer, using a simple word frequency vectorizer (count vectorizer) and oversampling on the training set in order to correct for the class imbalance. The probability threshold used to determine binary classification was lowered to .20 during the model training phase in order to reduce the number of false negatives and false positives.  
+The best performing model was a logistic regression classifer, using a simple word frequency vectorizer (Count Vectorizer) and oversampling on the training set in order to correct for the class imbalance. The probability threshold used to determine binary classification was lowered to .20 during the model training phase in order to reduce the number of false negatives and false positives.  
 
 Final metrics were as follows: Accuracy: 0.96, Precision: 0.74, Recall: 0.62, F1: 0.68
 
@@ -62,21 +63,30 @@ Final metrics were as follows: Accuracy: 0.96, Precision: 0.74, Recall: 0.62, F1
 
 ## Discussion:
 
-The final logistic regression model showed a small improvement over the baseline model in accuracy at 96% (versus 93%). Attempts were made to improve precision and recall metrics for each of the classifiers in the training stage by correcting for class imbalances and fine-tuning of the hyperparameters, but these only made minor improvements to the model fit.
+The final logistic regression model showed a small improvement over the baseline model in accuracy at 96% (versus 93%). Attempts were made to improve precision and recall metrics for each of the classifiers in the training stage by correcting for class imbalances and fine-tuning of the hyper-parameters, but these only made minor improvements to the model fit.
 
 Investigation of the tweets misclassified by the final model suggests that the presence of specific words or phrases is not enough to accurately identify whether a tweet can be considered hate speech. For example, some of the tweets incorrectly classified as "hate speech" contained references to racial and religious groups that could be perceived as hate speech without considering word order and context in the statement. 
 
-Interestingly, classifier performance using word embeddings from Word2Vec was not found to perform better predictions than a Bag of Words approach, which may be due to the inconsistent nature in which it seems the tweets were originally labeled as "hate" or "not hate". Furthermore, I found that using pre-trained embeddings from GloVe had little to no predictive value when testing my models, reiterating the unique nature of vocabularly that is used on social media platforms.
+Interestingly, classifier performance using word embeddings from Word2Vec was not found to perform better predictions than a Bag of Words (Count Vectorizer) approach, which may be due to the inconsistent nature in which it seems the tweets were originally classified as "hate" or "not hate". Furthermore, I found that using pre-trained embeddings from GloVe did not increase the performance of the basic classifiers, which reiterates some of the difficulties in obtaining universal representations of language found on social media platforms. 
 
+Finally, use of a Recurrent Neural Network, which allows for the order of the words to be taken into consideration when performing predictions, did not beat the performance of a simple logistic classifier on this dataset. While this seems surprising, existing research in this area suggests that simple classification models commonly outperform neural networks on text sentiment analysis tasks.
 
 ## Recommendations and Next Steps: 
 
-This project highlighted many of the challenges that can exist for social media platforms in accurately identifying hate speech on their platforms, including the lack of universal agreement on what qualifies something as hate speech.  
+This project reiterated many of the challenges that can exist for businesess in identifying hate speech on their platforms, including the lack of universal agreement on what qualifies something as hate speech.  
 
 In order to build better algorithms for detecting hate speech, companies should first ensure they have set clear and descriptive guidelines for people who are classifying the statements by hand. Requiring users to indicate why they are labeling a statement as hate speech (e.g., "contains racist content"), as well as the degree of the offense (e.g., "mild", "moderate", or "severe") can help companies train algorithms that are more sensitive to the complexities that exist with identifying and censoring hate speech content.
 
 Second, this project highlighted the unique challenges in working with social media data, which can consist of the use of hashtags, emjois, and unique vernacular that can be used to escape automatic detection by algorithms.  While I made the decision not to break up hashtags into individual words because I felt it would change the context and meaning in which the tweets were constructed, this is another area for future exploration. 
 
+
+## Resources:
+
+[Hate Lab:](https://hatelab.net) Hate Lab is a global hub for data and insight into hate speech and crime.
+
+[PeaceTechLab](https://www.peacetechlab.org/combating-online-hate-speech-main) Working to identify, monitor, and combat hate speech on social media.
+
+[The Effect of Extremist Violence on Hateful Speech Online:](https://www.unglobalpulse.org/sites/default/files/The%20effects%20of%20extremist%20violence%20on%20hateful%20speech%20online.pdf) UN paper highlighting links between online hate speech and offline violence.
 
 
 
