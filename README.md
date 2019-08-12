@@ -45,7 +45,7 @@ Seven classifiers were trained and tested for this project (Multinomial Naive Ba
 A wide variety of text pre-processing and feature engineering techniques were utilized and compared in order to improve classifier performance, including:
 
 - Stemming and Lemitization 
-- Text Vectorization Methods: Count Vectorizer, TFIDF, N-grams, Word2Vec, and pre-trained word vectors 
+- Text Vectorization Methods: Count Vectorizer, TFIDF, N-grams
 - Word Embeddings: I trained a Word2Vec model to obtain mean word embeddings specific to my dataset, and also employed transfer-learning techniques using the pre-trained [GloVe](https://nlp.stanford.edu/projects/glove/) word vectors for Twitter
 
 A broad range of techniques to address the imbalance in class size were also compared in the training phase for each classifier, including: oversampling, undersampling, SMOTE (synthetic oversampling minority technique), and the use of class weights. 
@@ -84,7 +84,7 @@ Second, this project highlighted the unique challenges in working with social me
 
 [Hate Lab:](https://hatelab.net) Hate Lab is a global hub for data and insight into hate speech and crime.
 
-[PeaceTechLab](https://www.peacetechlab.org/combating-online-hate-speech-main) Working to identify, monitor, and combat hate speech on social media.
+[PeaceTechLab:](https://www.peacetechlab.org/combating-online-hate-speech-main) Working to identify, monitor, and combat hate speech on social media.
 
 [The Effect of Extremist Violence on Hateful Speech Online:](https://www.unglobalpulse.org/sites/default/files/The%20effects%20of%20extremist%20violence%20on%20hateful%20speech%20online.pdf) UN paper highlighting links between online hate speech and offline violence.
 
