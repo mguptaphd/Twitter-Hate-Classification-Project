@@ -45,8 +45,8 @@ Seven classifiers were trained and tested for this project (Multinomial Naive Ba
 A wide variety of text pre-processing and feature engineering techniques were utilized and compared in order to improve classifier performance, including:
 
 - Stemming and Lemitization 
-- Text Vectorization Methods: Count Vectorizer, TFIDF, N-grams
-- Word Embeddings: I trained a Word2Vec model to obtain mean word embeddings specific to my dataset, and also employed transfer-learning techniques using the pre-trained [GloVe](https://nlp.stanford.edu/projects/glove/) word vectors for Twitter
+- Text Vectorization Methods: Count Vectorizer and TFIDF (with a range of 1-3 n-grams)
+- Word Embeddings: I trained a Word2Vec model to obtain mean word embeddings specific to my dataset, and also employed transfer-learning techniques using pre-trained [GloVe](https://nlp.stanford.edu/projects/glove/) word vectors for Twitter
 
 A broad range of techniques to address the imbalance in class size were also compared in the training phase for each classifier, including: oversampling, undersampling, SMOTE (synthetic oversampling minority technique), and the use of class weights. 
 
@@ -54,9 +54,9 @@ Finally, a grid search or randomized search was conducted to fine-tune the hyper
 
 ## Final Model Selection: 
 
-The best performing model was a logistic regression classifer, using a simple word frequency vectorizer (Count Vectorizer) and oversampling on the training set in order to correct for the class imbalance. The probability threshold used to determine binary classification was lowered to .20 during the model training phase in order to reduce the number of false negatives and false positives.  
+The best performing model was a logistic regression classifier, using a simple word frequency vectorizer (count vectorizer). Oversampling was used on the training data in order to help correct for the class imbalance.  The probability threshold for classifying a tweet as being "hate speech" was also lowered to .20 during the training phase in order to maximize F1 score.
 
-Final metrics were as follows: Accuracy: 0.96, Precision: 0.74, Recall: 0.62, F1: 0.68
+Final scores on the test data were as follows: Accuracy: 96%, Precision: 74%, Recall: 62%, F1: 68%
 
 ![](visualizations/final_cm.png)
 
@@ -69,7 +69,7 @@ Investigation of the tweets misclassified by the final model suggests that the p
 
 Interestingly, classifier performance using word embeddings from Word2Vec was not found to perform better predictions than a Bag of Words (Count Vectorizer) approach, which may be due to the inconsistent nature in which it seems the tweets were originally classified as "hate" or "not hate". Furthermore, I found that using pre-trained embeddings from GloVe did not increase the performance of the basic classifiers, which reiterates some of the difficulties in obtaining universal representations of language found on social media platforms. 
 
-Finally, use of a Recurrent Neural Network, which allows for the order of the words to be taken into consideration when performing predictions, did not beat the performance of a simple logistic classifier on this dataset. While this seems surprising, existing research in this area suggests that simple classification models commonly outperform neural networks on text sentiment analysis tasks.
+Finally, use of a Recurrent Neural Network, which allows for the order of the words to be taken into consideration when performing predictions, did not beat the performance of a simple logistic classifier on this dataset. While this seems surprising, existing research in this area suggests that simple classification models often outperform neural networks on text sentiment analysis tasks.
 
 ## Recommendations and Next Steps: 
 
