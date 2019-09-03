@@ -7,9 +7,9 @@ By: Manisha Gupta, Ph.D., Social Psychology (Concentration in Peace and the Prev
 Reported incidents of hate speech and hate crime have been growing in the United States and around the world in in recent years. Research indicates that one of the factors that has lead to this spike is the growing presence and influence that technology -- and in particular, social media platforms -- has had on people's daily lives. Online forums have provided a safe space for people to share extremist viewpoints without a fear of retribution, allowing them to cultivate followers more easily than than ever. Further, social media platforms are designed with the purpose of sharing content, and the more that individuals are exposed to extreme views, the less resistent they become to them -- including calls to participate in bigotry, hatred and violence in offline spaces.
 
 <p float="left">
-  <img src="/visualizations/readme/hate1.jpg" width="250" />
-  <img src="/visualizations/readme/hate2.jpg" width="250" />
-  <img src="/visualizations/readme/hate3.jpg" width="250" />
+  <img src="/graphics/readme/hate1.jpg" width="250" />
+  <img src="/graphics/readme/hate2.jpg" width="250" />
+  <img src="/graphics/readme/hate3.jpg" width="250" />
 </p>
 
 ## Challenges for Tech Giants in Monitoring Online Content:
@@ -31,11 +31,11 @@ The frequency of word counts and phrases, as well as predictive word embeddings 
 
 Pre-labeled as "Not Hate" Tweets:
 
-<img src="/visualizations/readme/wc0_original.jpg" width="500" />
+<img src="/graphics/readme/wc0_original.jpg" width="500" />
 
 Pre-labeled as "Hate Speech" Tweets:
 
-<img src="/visualizations/readme/wc1_original.jpg" width="500" />
+<img src="/graphics/readme/wc1_original.jpg" width="500" />
 
 
 ## Classifier Training:
@@ -58,7 +58,7 @@ The best performing model was a logistic regression classifier, using a simple w
 
 Final scores on the test data were as follows: Accuracy: 96%, Precision: 74%, Recall: 62%, F1: 68%
 
-![](visualizations/final_cm.png)
+![](graphics/final_cm.png)
 
 
 ## Discussion:
