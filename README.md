@@ -58,7 +58,7 @@ The best performing model was a logistic regression classifier, using a simple w
 
 Final scores on the test data were as follows: Accuracy: 96%, Precision: 74%, Recall: 62%, F1: 68%
 
-![](visualizations/final_cm.png)
+![](graphics/final_cm.png)
 
 
 ## Discussion:
